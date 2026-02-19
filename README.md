@@ -1,4 +1,4 @@
-# OpenClaw XHS Skill
+# 📕 OpenClaw XHS Skill
 
 > Xiaohongshu (Little Red Book) automation for [OpenClaw](https://openclaw.ai) — trending topics, AI content generation, and auto-publishing via Telegram/Discord.
 
