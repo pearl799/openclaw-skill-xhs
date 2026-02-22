@@ -232,26 +232,25 @@ def generate_copywriting(topic: str, style: str, image_count: int,
 
 
 def generate_images(image_prompts: list[str], output_dir: Path) -> list[str]:
-    """Generate images via OpenRouter API (GPT-5 Image Mini or Gemini)."""
+    """Generate images via configurable API (any OpenAI-compatible image generation endpoint)."""
     import requests as req
 
-    api_key = os.environ.get("IMAGE_API_KEY", "") or os.environ.get("OPENROUTER_API_KEY", "")
-    base_url = os.environ.get("IMAGE_BASE_URL", "https://openrouter.ai/api/v1/chat/completions")
-    model = os.environ.get("IMAGE_MODEL", "openai/gpt-5-image-mini")
+    api_key = os.environ.get("IMAGE_API_KEY", "")
+    base_url = os.environ.get("IMAGE_BASE_URL", "")
+    model = os.environ.get("IMAGE_MODEL", "")
 
-    # Fallback to old NanoBanana config
-    if not api_key:
-        api_key = os.environ.get("GEMINI_API_KEY", "")
-        base_url = os.environ.get("GEMINI_BASE_URL", "")
-        model = os.environ.get("GEMINI_MODEL", "gemini-3-pro-image-preview-2k")
-        if base_url and not base_url.endswith("/chat/completions"):
-            if base_url.endswith("/v1"):
-                base_url += "/chat/completions"
-            else:
-                base_url = base_url.rstrip("/") + "/v1/chat/completions"
+    if not api_key or not base_url or not model:
+        missing = [v for v, val in [("IMAGE_API_KEY", api_key), ("IMAGE_BASE_URL", base_url), ("IMAGE_MODEL", model)] if not val]
+        raise RuntimeError(f"Missing required env vars for image generation: {', '.join(missing)}. "
+                           f"Set them in your OpenClaw skill config.")
 
-    if not api_key:
-        raise RuntimeError("Missing IMAGE_API_KEY or OPENROUTER_API_KEY for image generation")
+    # Normalize base_url: ensure it ends with /chat/completions
+    if not base_url.endswith("/chat/completions"):
+        base_url = base_url.rstrip("/")
+        if base_url.endswith("/v1"):
+            base_url += "/chat/completions"
+        else:
+            base_url = base_url + "/v1/chat/completions"
 
     url = base_url
 

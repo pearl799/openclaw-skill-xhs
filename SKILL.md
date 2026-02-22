@@ -7,7 +7,7 @@ metadata:
     "openclaw":
       {
         "emoji": "📕",
-        "requires": { "bins": ["uv"], "env": ["XHS_TOOLKIT_DIR"] },
+        "requires": { "bins": ["uv"], "env": ["XHS_TOOLKIT_DIR", "IMAGE_API_KEY", "IMAGE_BASE_URL", "IMAGE_MODEL"] },
         "primaryEnv": "XHS_TOOLKIT_DIR",
         "install":
           [
@@ -26,6 +26,17 @@ metadata:
 # 小红书自动化 (XHS)
 
 **重要：所有小红书操作必须使用 exec 工具执行以下命令，不要用 browser 工具打开网页。**
+
+## 环境变量
+
+| 变量 | 必填 | 说明 |
+|------|------|------|
+| `XHS_TOOLKIT_DIR` | 是 | xhs-toolkit 项目路径（`git clone https://github.com/pearl799/xhs-toolkit`） |
+| `IMAGE_API_KEY` | 是 | 图片生成 API Key（任意 OpenAI 兼容的图片生成服务） |
+| `IMAGE_BASE_URL` | 是 | 图片生成 API Base URL（例如 `https://openrouter.ai/api/v1/chat/completions`） |
+| `IMAGE_MODEL` | 是 | 图片生成模型名称（例如 `google/gemini-3-pro-image-preview`） |
+| `OPENCLAW_GATEWAY_TOKEN` | 否 | OpenClaw Gateway token（文案生成用，如果 gateway 开了 auth） |
+| `XHS_DATA_DIR` | 否 | 数据目录，默认 `~/.openclaw/skills/xhs/data` |
 
 ## 命令
 
