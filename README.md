@@ -2,7 +2,7 @@
 
 > Xiaohongshu (Little Red Book) automation for [OpenClaw](https://openclaw.ai) — trending topics, AI content generation, and auto-publishing via Telegram/Discord.
 
-小红书自动化技能 — 通过 Telegram / Discord 控制：爬取热点、AI 生成图文、一键发布。
+English | [中文](README_CN.md)
 
 ## Features
 
