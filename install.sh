@@ -122,14 +122,22 @@ else
 
     # Ask for OpenRouter API key
     echo ""
-    echo -e "${CYAN}OpenRouter API key is required for AI image generation.${NC}"
-    echo "Get one at: https://openrouter.ai/keys"
+    echo -e "${CYAN}Image generation requires an OpenAI-compatible API.${NC}"
+    echo "You can use OpenRouter, NanoBanana, or any provider."
     echo ""
-    read -p "Enter your OpenRouter API key (or press Enter to skip): " OPENROUTER_KEY
+    read -p "Enter your image API key (or press Enter to skip): " IMAGE_KEY
+    read -p "Enter your image API base URL (e.g. https://openrouter.ai/api/v1/chat/completions): " IMAGE_URL
+    read -p "Enter your image model name (e.g. google/gemini-3-pro-image-preview): " IMAGE_MDL
 
-    if [[ -z "$OPENROUTER_KEY" ]]; then
-        OPENROUTER_KEY="<YOUR_OPENROUTER_API_KEY>"
-        warn "No API key provided. You'll need to set IMAGE_API_KEY later in openclaw.json"
+    if [[ -z "$IMAGE_KEY" ]]; then
+        IMAGE_KEY=""
+        warn "No API key provided. Set IMAGE_API_KEY in openclaw.json before using AI image generation."
+    fi
+    if [[ -z "$IMAGE_URL" ]]; then
+        IMAGE_URL=""
+    fi
+    if [[ -z "$IMAGE_MDL" ]]; then
+        IMAGE_MDL=""
     fi
 
     # Try to read existing gateway token
@@ -151,34 +159,18 @@ except:
         warn "Could not detect gateway token. Set OPENCLAW_GATEWAY_TOKEN in openclaw.json."
     fi
 
-    # Inject config using Python (safe JSON manipulation)
-    python3 << PYEOF
-import json
-from pathlib import Path
-
-config_path = Path("$OPENCLAW_CONFIG")
-cfg = json.loads(config_path.read_text())
-
-# Ensure structure
-cfg.setdefault("skills", {}).setdefault("entries", {})
-
-cfg["skills"]["entries"]["xhs"] = {
-    "env": {
-        "XHS_TOOLKIT_DIR": "$TOOLKIT_DIR",
-        "XHS_COOKIES_FILE": "$CRED_DIR/xhs_cookies.json",
-        "XHS_DATA_DIR": "$SKILL_DIR/data",
-        "XHS_CHROME_PROFILE": "$SKILL_DIR/chrome-data",
-        "CHROME_PATH": "$CHROME_PATH",
-        "IMAGE_API_KEY": "$OPENROUTER_KEY",
-        "IMAGE_BASE_URL": "https://openrouter.ai/api/v1/chat/completions",
-        "IMAGE_MODEL": "google/gemini-3-pro-image-preview",
-        "OPENCLAW_GATEWAY_TOKEN": "$GATEWAY_TOKEN"
-    }
-}
-
-config_path.write_text(json.dumps(cfg, indent=2, ensure_ascii=False))
-print("Config updated successfully.")
-PYEOF
+    # Inject config using the helper script (safe JSON manipulation)
+    python3 "$REPO_DIR/scripts/configure_openclaw.py" \
+        --config "$OPENCLAW_CONFIG" \
+        --toolkit-dir "$TOOLKIT_DIR" \
+        --cookies-file "$CRED_DIR/xhs_cookies.json" \
+        --data-dir "$SKILL_DIR/data" \
+        --chrome-profile "$SKILL_DIR/chrome-data" \
+        --chrome-path "$CHROME_PATH" \
+        --image-api-key "$IMAGE_KEY" \
+        --image-base-url "$IMAGE_URL" \
+        --image-model "$IMAGE_MDL" \
+        --gateway-token "$GATEWAY_TOKEN"
 
     ok "openclaw.json configured"
 fi
@@ -204,7 +196,7 @@ echo "     - Say: \"小红书热点\" to fetch trending topics"
 echo "     - Say: \"帮我生成一篇小红书\" to generate content"
 echo "     - Say: \"发布\" to publish"
 echo ""
-if [[ "$OPENROUTER_KEY" == "<YOUR_OPENROUTER_API_KEY>" ]]; then
-    echo -e "  ${YELLOW}Remember to set your OpenRouter API key in ~/.openclaw/openclaw.json${NC}"
+if [[ -z "$IMAGE_KEY" ]]; then
+    echo -e "  ${YELLOW}Remember to set IMAGE_API_KEY, IMAGE_BASE_URL, IMAGE_MODEL in ~/.openclaw/openclaw.json${NC}"
     echo ""
 fi

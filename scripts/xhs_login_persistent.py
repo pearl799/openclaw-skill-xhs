@@ -30,17 +30,17 @@ def main():
         os.path.expanduser("~/.openclaw/credentials/xhs_cookies.json"),
     )
 
+    chrome_path = os.environ.get(
+        "CHROME_PATH",
+        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    )
+
     options = Options()
-    options.binary_location = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    options.binary_location = chrome_path
     # NOT headless — user needs to see the browser to scan QR
-    options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument(f"--user-data-dir={profile_dir}")
     options.add_argument("--window-size=1200,900")
-    options.add_argument(
-        "--user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
-    )
 
     print("🌐 正在打开 Chrome（持久化 profile）...")
     driver = webdriver.Chrome(options=options)
