@@ -7,7 +7,7 @@
 ## Features
 
 - **Trending** — Scrape trending topics from Xiaohongshu explore page
-- **AI Content** — Generate copywriting (Claude) + images (Gemini) tailored for XHS style
+- **AI Content** — Generate copywriting (Claude) + images (any OpenAI-compatible image API) tailored for XHS style
 - **Auto Publish** — Upload images, fill title/content/topics, click publish — fully automated
 - **Full Pipeline** — Trending → Generate → Preview → Publish in one command
 
@@ -17,7 +17,7 @@
 - [OpenClaw](https://openclaw.ai) installed and configured
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 - Google Chrome
-- [OpenRouter](https://openrouter.ai) API key (for AI image generation)
+- An OpenAI-compatible image generation API (e.g. OpenRouter, NanoBanana, or any provider)
 
 ## Install
 
@@ -59,8 +59,9 @@ All settings are in `~/.openclaw/openclaw.json` under `skills.entries.xhs.env`:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `IMAGE_API_KEY` | Yes | OpenRouter API key for image generation |
-| `IMAGE_MODEL` | No | Default: `google/gemini-3-pro-image-preview` |
+| `IMAGE_API_KEY` | Yes | API key for image generation (any OpenAI-compatible provider) |
+| `IMAGE_BASE_URL` | Yes | Image API base URL (e.g. `https://openrouter.ai/api/v1/chat/completions`) |
+| `IMAGE_MODEL` | Yes | Image model name (e.g. `google/gemini-3-pro-image-preview`) |
 | `XHS_TOOLKIT_DIR` | Auto | Set by installer |
 | `XHS_COOKIES_FILE` | Auto | Set by installer |
 | `OPENCLAW_GATEWAY_TOKEN` | Auto | Detected from gateway config |
@@ -83,8 +84,8 @@ cd openclaw-skill-xhs
 - If expired, re-login: run `xhs_login_persistent.py`
 
 **Image generation fails**
-- Verify your OpenRouter API key is valid
-- The API is intermittent — the script retries up to 3 times automatically
+- Verify `IMAGE_API_KEY`, `IMAGE_BASE_URL`, `IMAGE_MODEL` are correctly set in `openclaw.json`
+- The script retries up to 3 times automatically on transient errors
 
 **Chrome won't start**
 - Kill stale processes: `pkill -f chrome-data`
